@@ -6,7 +6,8 @@ const modifier = require('../middlewares/modifier');
 const gravatar = require('gravatar');
 const fs = require("fs/promises");
 const path = require("path");
-
+const uuid = require('uuid');
+const mailsender = require("../middlewares/mailSender");
 const avatarDir = path.join(__dirname, "../", "public", "avatars");
 require("dotenv").config();
 
@@ -65,10 +66,17 @@ class UserController {
 
       const hashPassword = await bcrypt.hash(password, 12);
       const avatarURL = gravatar.url(email);
+      const verificationToken  = uuid.v4();
+      const successful = await mailsender(email,verificationToken);
+      
+      if(!successful){
+        return 
+      }
+
       const newUser = await User.create({
         ...req.body,
         password: hashPassword,
-        avatarURL
+        avatarURL,verificationToken
       });
       res.status(201).json({
         user: { email: newUser.email, subscription: newUser.subscription },
@@ -110,6 +118,36 @@ class UserController {
     await User.findByIdAndUpdate(_id, { avatarURL });
   
     res.json({ avatarURL });
+  }
+
+  async verifyUser(req,res,next){
+    const {verificationToken } = req.params;
+    const user = User.findOne({verificationToken});
+    
+    if(!user){
+      return next(HttpError(404,"User not found"))
+    }
+    const {_id } = user;
+
+    await User.findByIdAndUpdate(_id,{verify: true,verificationToken: null});
+    res.status(200).json({ message: 'Verification successful'});
+  }
+
+  async resendVerifyMessage (req,res,next){
+    const {email} =req.body;
+    const user = User.findOne({email});
+
+    if(!user){
+      return next(HttpError(404,"User not found"));
+    }
+
+    if(user.verify){
+      return next(HttpError(404,"Verification has already been passed"));
+    }
+
+    await mailsender(email,user.verificationToken);
+
+    res.status(200).json({message:"Verification email sent"});
   }
 }
 
