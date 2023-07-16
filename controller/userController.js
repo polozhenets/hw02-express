@@ -122,7 +122,7 @@ class UserController {
 
   async verifyUser(req,res,next){
     const {verificationToken } = req.params;
-    const user = User.findOne({verificationToken});
+    const user =await User.findOne({verificationToken});
     
     if(!user){
       return next(HttpError(404,"User not found"))

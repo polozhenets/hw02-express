@@ -16,8 +16,9 @@ const mailsender = async (email, verifyToken) => {
     const info = await transporter.sendMail({
       from: "kyrylo_polozhenets@meta.ua",
       to: email,
-      subject: "Nodemailer test",
-      text: `Привіт. Ми тестуємо надсилання листів! ${verifyToken}`,
+      subject: "Mail confirmation",
+      text: `Hello please confirm the email!`,
+      html: `<a href="${process.env.BASE_URL}/users/verify/${verifyToken}">Confirm your email</a>`,
     });
     console.log(info);
     return info;
