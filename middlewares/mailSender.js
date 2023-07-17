@@ -20,7 +20,6 @@ const mailsender = async (email, verifyToken) => {
       text: `Hello please confirm the email!`,
       html: `<a href="${process.env.BASE_URL}/users/verify/${verifyToken}">Confirm your email</a>`,
     });
-    console.log(info);
     return info;
   } catch (error) {
     console.log(error);

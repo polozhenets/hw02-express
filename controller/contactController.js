@@ -70,7 +70,6 @@ class ContactController {
 
   async updateStatusFavoriteContact(req, res, next) {
     try {
-      console.log(req.params.contactId);
       const contact = await ContactService.updateContact(
         req.params.contactId,
         req.body

@@ -20,7 +20,6 @@ class UserController {
   async login(req, res, next) {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    console.log(process.env.SECRET_KEY);
 
     if (!user) {
       next(HttpError(401, `Email or password is wrong`));
@@ -144,7 +143,6 @@ class UserController {
     if(!user){
       return next(HttpError(404,"User not found"));
     }
-    console.log(user);
     if(user.verify){
       return next(HttpError(400,"Verification has already been passed"));
     }
