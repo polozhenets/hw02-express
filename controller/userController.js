@@ -21,6 +21,7 @@ class UserController {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     console.log(process.env.SECRET_KEY);
+
     if (!user) {
       next(HttpError(401, `Email or password is wrong`));
       return;
@@ -31,6 +32,9 @@ class UserController {
     if (!comparePassword) {
       return res.status(401).json({message: "Email or password is wrong"})
     }
+
+    const {verify} = user;
+    if(!verify) return next(HttpError(401,"User not verified"));
 
     const payload = {
       id: user._id,
@@ -53,7 +57,7 @@ class UserController {
     res.status(204).json();
   }
 
-  async register(req, res) {
+  async register(req, res,next) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ email });
@@ -70,7 +74,7 @@ class UserController {
       const successful = await mailsender(email,verificationToken);
       
       if(!successful){
-        return 
+        return next(HttpError(401,"Email send error"));
       }
 
       const newUser = await User.create({
@@ -135,14 +139,14 @@ class UserController {
 
   async resendVerifyMessage (req,res,next){
     const {email} =req.body;
-    const user = User.findOne({email});
+    const user = await User.findOne({email});
 
     if(!user){
       return next(HttpError(404,"User not found"));
     }
-
+    console.log(user);
     if(user.verify){
-      return next(HttpError(404,"Verification has already been passed"));
+      return next(HttpError(400,"Verification has already been passed"));
     }
 
     await mailsender(email,user.verificationToken);
