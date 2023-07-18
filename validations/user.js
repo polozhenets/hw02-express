@@ -46,9 +46,19 @@ const subscriptionSchema = Joi.object({
     .required(),
 });
 
+
+const resentVerificationSchema = Joi.object({
+  email: Joi.string().pattern(emailRegEx).required().messages({
+    "string.pattern.base": "You have misprint in your email",
+  }),
+});
+
+
 const userSchema = {
   registerSchema,
   loginSchema,
   subscriptionSchema,
+  resentVerificationSchema
 };
+
 module.exports = userSchema;

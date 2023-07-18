@@ -32,7 +32,6 @@ const validateID = async (req,res,next)=>{
   const { contactId } = req.params;
   if (!isValidObjectId(contactId)) next(HttpError(400, "id no valid"));
 
-  console.log(isValidObjectId(contactId))
 
   const contact = await contactController.getById(contactId);
   if (!contact) next(HttpError(404, "Not found"));

@@ -2,7 +2,7 @@ const ContactModel = require('../models/contacts')
 
 class ContactService{
     
-  listContacts = async () => {
+    listContacts = async () => {
     const contacts = await ContactModel.find();
     return contacts;
   }
@@ -18,7 +18,6 @@ class ContactService{
   }
   
     addContact = async (body,owner) => {
-    console.log(body);
     const newContact = await ContactModel.create({...body,owner});
     return newContact;
   }
